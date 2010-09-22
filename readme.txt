@@ -6,6 +6,10 @@ License: New BSD License, http://www.opensource.org/licenses/bsd-license.php
 
 Part of the original intention for developing Dumperor is to check whether a migration of SQL scripts from one database to another is successful, you know, by comparing the differences between two files, one dumped before executing scripts and the other after. The second part is to ensure that upgrades to table structures or data not miss anything, similarly. The last part is to take samples of databases and put up development or testing environments with them, or even replace sensitive information with fake data.
 
+Dumperor is hosted on Google Code:
+
+http://code.google.com/p/dumperor/
+
 =Features=
 
   # Currently support Microsoft SQL Server, Oracle and MySQL.
