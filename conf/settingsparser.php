@@ -146,7 +146,7 @@ class SettingsParser
     function Validate()
     {
         if (!is_array($this->arrRawCfg) || count($this->arrRawCfg)<=0) {
-            throw new Exception('Nothing found from '.$strFilePath);
+            throw new Exception('Nothing found from the settings file.');
         }
 
         // DB section should not be missed
