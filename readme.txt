@@ -21,7 +21,7 @@ http://code.google.com/p/dumperor/
   # Options controlling which information should be and should not be dumped from the database.
   # A limit number can be set to take sample of a huge database.
   # Needless tables or columns can be prevented from appearing in dumped results.
-  # Only the needed tables to be exported if you like.
+  # Only the needed tables are to be exported if you like.
   # Sensitive columns can be dumped with fake data.
   # Conditions can be added to data querying statements.
   # With PDO support by default but extensive to many kinds of database toolkits.
