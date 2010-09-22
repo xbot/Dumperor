@@ -28,7 +28,7 @@ class SettingsParser
     function ParseFile($strFilePath)
     {
         try {
-            $this->arrRawCfg = parse_ini_file($strFilePath, true);
+            $this->arrRawCfg = @parse_ini_file($strFilePath, true);
             $this->Sanitize();
             $this->ParseRawCfg();
             $this->Validate();
@@ -87,13 +87,9 @@ class SettingsParser
 
         if (is_string($rawTbl)) {
             $this->set('exclusive', 'tables', explode(',', $rawTbl));
-        } else {
-            $this->set('exclusive', 'tables', array());
         }
         if (is_string($rawCol)) {
             $this->set('exclusive', 'columns', explode(',', $rawCol));
-        } else {
-            $this->set('exclusive', 'columns', array());
         }
     }
 
@@ -106,8 +102,6 @@ class SettingsParser
 
         if (is_string($rawTbl)) {
             $this->set('inclusive', 'tables', explode(',', $rawTbl));
-        } else {
-            $this->set('inclusive', 'tables', array());
         }
     }
 
@@ -191,12 +185,13 @@ class SettingsParser
 
         if (isset($this->arrRawCfg[$strSec])) {
             if (false !== $strOpt) {
-                if (false !== $strOpt && isset($this->arrRawCfg[$strSec][$strOpt]))
+                if (isset($this->arrRawCfg[$strSec][$strOpt]))
                     return $this->arrRawCfg[$strSec][$strOpt];
                 else
-                    return false;
+                    return null;
+            } else {
+                return $this->arrRawCfg[$strSec];
             }
-            return $this->arrRawCfg[$strSec];
         }
 
         return null;

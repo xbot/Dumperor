@@ -488,7 +488,9 @@ abstract class GenericDumper
      **/
     function SetDBName($strDBName)
     {
-        $this->strDBName = $strDBName;
+        if (is_string($strDBName) && strlen($strDBName)>0) {
+            $this->strDBName = $strDBName;
+        }
     }
 
     /**
@@ -512,7 +514,9 @@ abstract class GenericDumper
      **/
     function SetEscapeTables($arrTableName)
     {
-        $this->arrEscapeTable = $arrTableName;
+        if (is_array($arrTableName)) {
+            $this->arrEscapeTable = $arrTableName;
+        }
     }
 
     /**
@@ -520,7 +524,9 @@ abstract class GenericDumper
      **/
     function AddEscapeTables($arrTableName)
     {
-        $this->arrEscapeTable = array_merge($this->arrEscapeTable, $arrTableName);
+        if (is_array($arrTableName)) {
+            $this->arrEscapeTable = array_merge($this->arrEscapeTable, $arrTableName);
+        }
     }
 
     /**
@@ -544,7 +550,9 @@ abstract class GenericDumper
      **/
     function SetEscapeColumns($arrEscapeColumn)
     {
-        $this->arrEscapeColumn = $arrEscapeColumn;
+        if (is_array($arrEscapeColumn)) {
+            $this->arrEscapeColumn = $arrEscapeColumn;
+        }
     }
 
     /**
@@ -552,7 +560,9 @@ abstract class GenericDumper
      **/
     function SetTableEscapeColumns($strTableName, $arrColumn)
     {
-        $this->arrEscapeColumn[$strTableName] = $arrColumn;
+        if (is_string($strTableName) && strlen($strTableName)>0 && is_array($arrColumn)) {
+            $this->arrEscapeColumn[$strTableName] = $arrColumn;
+        }
     }
 
     /**
@@ -560,7 +570,9 @@ abstract class GenericDumper
      **/
     function SetIncludeTables($arrTableName)
     {
-        $this->arrIncludeTable = $arrTableName;
+        if (is_array($arrTableName)) {
+            $this->arrIncludeTable = $arrTableName;
+        }
     }
 
     /**
@@ -568,7 +580,9 @@ abstract class GenericDumper
      **/
     function AddIncludeTables($arrTableName)
     {
-        $this->arrIncludeTable = array_merge($this->arrIncludeTable, $arrTableName);
+        if (is_array($arrTableName)) {
+            $this->arrIncludeTable = array_merge($this->arrIncludeTable, $arrTableName);
+        }
     }
 
     /**
@@ -584,7 +598,9 @@ abstract class GenericDumper
      **/
     function SetCommonCond($arrCond)
     {
-        $this->arrCommonCond = $arrCond;
+        if (is_array($arrCond)) {
+            $this->arrCommonCond = $arrCond;
+        }
     }
 
     /**
@@ -600,7 +616,9 @@ abstract class GenericDumper
      **/
     function SetCommonEscCol($arrEscCol)
     {
-        $this->arrCommonEscCol = $arrEscCol;
+        if (is_array($arrEscCol)) {
+            $this->arrCommonEscCol = $arrEscCol;
+        }
     }
 
     /**
@@ -616,7 +634,9 @@ abstract class GenericDumper
      **/
     function SetFakeData($arrFakeData)
     {
-        $this->arrFakeData = $arrFakeData;
+        if (is_array($arrFakeData)) {
+            $this->arrFakeData = $arrFakeData;
+        }
     }
 
     /**
@@ -629,7 +649,9 @@ abstract class GenericDumper
      **/
     function SetFakeColumn($strTableName, $strColumnName, $mixData=false)
     {
-        $this->arrFakeData[$strTableName][$strColumnName] = $mixData;
+        if (is_string($strTableName) && strlen($strTableName)>0 && is_string($strColumnName) && strlen($strColumnName)>0 && is_scalar($mixData)) {
+            $this->arrFakeData[$strTableName][$strColumnName] = $mixData;
+        }
     }
 
     /**
@@ -640,7 +662,9 @@ abstract class GenericDumper
      **/
     function SetLimit($intLimit)
     {
-        $this->intLimit = $intLimit;
+        if (is_numeric($intLimit) && is_int($intLimit+0) && $intLimit>=0) {
+            $this->intLimit = $intLimit;
+        }
     }
 }
 ?>
