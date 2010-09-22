@@ -1,5 +1,6 @@
 Author: Li Dong <lenin.lee@gmail.com>
 Website: http://sinolog.it
+Homepage: http://sinolog.it/?p=1617
 License: New BSD License, http://www.opensource.org/licenses/bsd-license.php
 
 *Dumperor* is a multi-database dumping toolkit. It dumps table structures and data from databases, and generates CREATE-TABLE SQL statements for table structures or INSERT SQL statements for data.
