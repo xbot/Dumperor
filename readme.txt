@@ -7,9 +7,11 @@ License: New BSD License, http://www.opensource.org/licenses/bsd-license.php
 
 Part of the original intention for developing Dumperor is to check whether a migration of SQL scripts from one database to another is successful, you know, by comparing the differences between two files, one dumped before executing scripts and the other after. The second part is to ensure that upgrades to table structures or data not miss anything, similarly. The last part is to take samples of databases and put up development or testing environments with them, or even replace sensitive information with fake data.
 
-Dumperor is hosted on Google Code using the <a href="http://www.opensource.org/licenses/bsd-license.php">New BSD License</a>:
+Dumperor is written in PHP 5 and hosted on Google Code using the <a href="http://www.opensource.org/licenses/bsd-license.php">New BSD License</a>:
 
 http://code.google.com/p/dumperor/
+
+For the shortage of time, there must be some limitations and bugs in Dumperor. So reports from users are welcome, emails prefered. I will be very grateful if someone send their suggestions on Dumpeor to me.
 
 =Features=
 
