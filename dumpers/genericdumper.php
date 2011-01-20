@@ -50,7 +50,15 @@ abstract class GenericDumper
      * @param string Table name
      * @return array Two-dimensional array, containing three sub arrays: names, types and lengths
      **/
-    abstract function DumpColumnInfo($strTableName);
+    abstract function DumpColumnFullInfo($strTableName);
+
+    /**
+     * Dump name,type,length of each field from the given table in the given database, except those to be escaped
+     *
+     * @param string Table name
+     * @return array Two-dimensional array, containing three sub arrays: names, types and lengths
+     **/
+    abstract function DumpColumnBriefInfo($strTableName);
 
     /**
      * Dump primary key constraint
@@ -78,7 +86,7 @@ abstract class GenericDumper
     {
         $objStruct = false;
 
-        $arrMeta = $this->DumpColumnInfo($strTableName);
+        $arrMeta = $this->DumpColumnFullInfo($strTableName);
         if (count($arrMeta) == 6) {
             $objStruct = new TableStructure($strTableName);
             $objStruct->SetColumnNames($arrMeta[0]);
@@ -95,11 +103,11 @@ abstract class GenericDumper
         return $objStruct;
     }
 
-    function DumpTableStructure2($strTableName)
+    function DumpTableInfo($strTableName)
     {
         $struct = array();
 
-        $arrFields = $this->DumpColumnInfo2($strTableName);
+        $arrFields = $this->DumpColumnBriefInfo($strTableName);
         ksort($arrFields);
 
         $struct['name'] = $strTableName;

@@ -1,0 +1,1 @@
+  - DumpColumnBriefInfo() should use DumpColumnFullInfo() to fetch column information

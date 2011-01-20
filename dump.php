@@ -18,7 +18,7 @@ set_time_limit(0);
 
 $objCfg = new SettingsParser();
 try {
-    $objCfg->ParseFile('conf/dumperor.ini');
+    $objCfg->ParseFile('conf/'.urldecode($_GET['c']).'.ini');
 } catch (Exception $e) {
     die($e->GetMessage());
 }
@@ -64,9 +64,8 @@ StartHTMLPage($objCfg);
 $arrTbl = $dumper->DumpTableNames();
 sort($arrTbl);
 foreach ($arrTbl as $strTbl) {
-    $objStruct = $dumper->DumpTableStructure2($strTbl);
-    file_put_contents('/tmp/mssql_table.txt', print_r($objStruct, true), FILE_APPEND);
-    //file_put_contents('c:/mysql_table.txt', print_r($objStruct, true), FILE_APPEND);
+    $objStruct = $dumper->DumpTableInfo($strTbl);
+    file_put_contents(urldecode($_GET['c']).'_table.txt', print_r($objStruct, true), FILE_APPEND);
     echo '<pre>';
     print_r($objStruct);
     echo '</pre>';

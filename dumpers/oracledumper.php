@@ -46,13 +46,7 @@ class ORACLEDumper extends GenericDumper
         return $arrTableName;
     }
 
-    /**
-     * Dump name,type,length of each field from the given table in the given database, except those to be escaped
-     *
-     * @param string Table name
-     * @return array Two-dimensional array, containing three sub arrays: names, types and lengths
-     **/
-    function DumpColumnInfo($strTableName)
+    function DumpColumnFullInfo($strTableName)
     {
         $arrName = array();
         $arrType = array();
@@ -94,6 +88,77 @@ class ORACLEDumper extends GenericDumper
         }
 
         $arrField = array($arrName, $arrType, $arrLength, $arrPrecision, $arrNullable, $arrDefault);
+
+        return $arrField;
+    }
+
+    function DumpColumnBriefInfo($strTableName)
+    {
+        $arrField = array();
+        $strTableName = strtoupper($strTableName);
+        $strOrderCond = " order by col.column_id";
+        $st = new TableStructure($strTableName);
+
+        $sql = "select col.column_name as fld_name,col.data_type as fld_type,nvl(col.data_precision,0) as fld_length,nvl(col.data_scale,0) as fld_precision,nvl(col.char_col_decl_length,0) as fld_char_length,col.nullable as fld_nullable,col.data_default as fld_default";
+        $sql .= " from user_tab_columns col";
+        $sql .= " where col.table_name='$strTableName'";
+        $sql .= $strOrderCond;
+        //echo htmlspecialchars($sql);die;
+
+        $rs = $this->objDB->query($sql);
+        if ($rs) {
+            while (($arrRow = $this->objDB->read($rs)) !== false) {
+                $arr = array();
+                $arr['fld_name'] = $arrRow['FLD_NAME'];
+                $strType = $arrRow['FLD_TYPE'];
+                $arr['fld_type'] = $strType;
+                if (self::IsNumCol($strType)) {
+                    $arr['fld_length'] = $arrRow['FLD_LENGTH'];
+                    $arr['fld_precision'] = $arrRow['FLD_PRECISION'];
+                } else if (self::IsCharCol($strType)) {
+                    $arr['fld_length'] = $arrRow['FLD_CHAR_LENGTH'];
+                    $arr['fld_precision'] = 0;
+                } else {
+                    $arr['fld_length'] = 0;
+                    $arr['fld_precision'] = 0;
+                }
+                $arr['fld_nullable'] = $arrRow['FLD_NULLABLE'];
+                $arr['fld_default'] = $arrRow['FLD_DEFAULT'];
+
+                //...
+                if ($st->IsNonPrecType($arr['fld_type'])) {
+                    $arr['fld_length'] = '';
+                    $arr['fld_precision'] = '';
+                }
+                switch ($arr['fld_type']) {
+                    case 'NUMBER':
+                    case 'INT':
+                        $arr['fld_type'] = 'number';
+                        break;
+
+                    case 'NVARCHAR2':
+                    case 'VARCHAR2':
+                    case 'NCHAR2':
+                    case 'CHAR2':
+                    case 'LONG':
+                    case 'BLOB':
+                    case 'CLOB':
+                        $arr['fld_type'] = 'text';
+                        break;
+
+                    case 'DATE':
+                        $arr['fld_type'] = 'date';
+                        break;
+                    
+                    default:
+                        // code...
+                        break;
+                }
+
+                $arrField[$arr['fld_name']] = $arr;
+            }
+            $this->objDB->free($rs);
+        }
 
         return $arrField;
     }

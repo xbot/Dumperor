@@ -57,13 +57,7 @@ class MSSQLDumper extends GenericDumper
         return $arrTableName;
     }
 
-    /**
-     * Dump name,type,length of each field from the given table in the given database, except those to be escaped
-     *
-     * @param string Table name
-     * @return array Two-dimensional array, containing three sub arrays: names, types and lengths
-     **/
-    function DumpColumnInfo($strTableName)
+    function DumpColumnFullInfo($strTableName)
     {
         $arrName = array();
         $arrType = array();
@@ -109,7 +103,7 @@ class MSSQLDumper extends GenericDumper
         return $arrField;
     }
 
-    function DumpColumnInfo2($strTableName)
+    function DumpColumnBriefInfo($strTableName)
     {
         $st = new TableStructure($strTableName);
         $arrField = array();
