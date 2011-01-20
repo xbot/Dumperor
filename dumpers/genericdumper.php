@@ -95,6 +95,21 @@ abstract class GenericDumper
         return $objStruct;
     }
 
+    function DumpTableStructure2($strTableName)
+    {
+        $struct = array();
+
+        $arrFields = $this->DumpColumnInfo2($strTableName);
+        ksort($arrFields);
+
+        $struct['name'] = $strTableName;
+        $struct['fields'] = $arrFields;
+        //$struct['pk'] = $this->DumpPrimaryConstraint($strTableName);
+        //$struct['uk'] = $this->DumpUniqueConstraints($strTableName);
+
+        return $struct;
+    }
+
     /**
      * Dump all data
      *

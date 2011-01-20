@@ -62,8 +62,15 @@ $dumper->SetLimit($intLimit);
 StartHTMLPage($objCfg);
 
 $arrTbl = $dumper->DumpTableNames();
+sort($arrTbl);
 foreach ($arrTbl as $strTbl) {
-    $objStruct = $dumper->DumpTableStructure($strTbl);
+    $objStruct = $dumper->DumpTableStructure2($strTbl);
+    file_put_contents('/tmp/mssql_table.txt', print_r($objStruct, true), FILE_APPEND);
+    //file_put_contents('c:/mysql_table.txt', print_r($objStruct, true), FILE_APPEND);
+    echo '<pre>';
+    print_r($objStruct);
+    echo '</pre>';
+    /*
     if ($bShowTbl) {
         $objStruct->OutputHTML();
     }
@@ -78,6 +85,7 @@ foreach ($arrTbl as $strTbl) {
         $dumper->DumpTable($strTbl, $strOutput2, true);
         echo '</pre>';
     }
+     */
 }
 
 StopHTMLPage($objCfg);

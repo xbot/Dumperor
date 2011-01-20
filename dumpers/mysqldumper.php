@@ -111,6 +111,93 @@ class MYSQLDumper extends GenericDumper
         return $arrField;
     }
 
+    function DumpColumnInfo2($strTableName)
+    {
+        $strTableName = strtolower($strTableName);
+        $arrField = array();
+        $strOrderCond = " order by col.ordinal_position";
+        $st = new TableStructure($strTableName);
+
+        $sql = "select col.column_name as fld_name,col.column_type as fld_type,col.is_nullable as fld_nullable,ifnull(col.column_default,'') as fld_default";
+        $sql .= " from information_schema.columns col";
+        $sql .= " where col.table_schema='$this->strDBName' and col.table_name='$strTableName'";
+        $sql .= $strOrderCond;
+
+        $rs = $this->objDB->query($sql);
+        if ($rs) {
+            while (($arrRow = $this->objDB->read($rs)) !== false) {
+                $arr = array();
+
+                $arr['fld_name'] = $arrRow['fld_name'];
+
+                // Filtrate column type, length, precision
+                $strColumnType = $arrRow['fld_type'];
+                // Manipulate column types like decimal(22,0), varchar(128) and so on
+                $numIdx1 = strpos($strColumnType, '(');
+                $numIdx2 = strpos($strColumnType, ',');
+                $numIdx3 = strpos($strColumnType, ')');
+                if (false === $numIdx1) {
+                    $arr['fld_type'] = $strColumnType;
+                } else {
+                    $arr['fld_type'] = substr($strColumnType, 0, $numIdx1);
+                }
+                // Manipulate column length and precision
+                if (false === $numIdx1) {
+                    $arr['fld_length'] = 0;
+                    $arr['fld_precision'] = 0;
+                } else {
+                    if (false === $numIdx2) {
+                        $arr['fld_length'] = substr($strColumnType, $numIdx1+1, $numIdx3-$numIdx1-1);
+                        $arr['fld_precision'] = 0;
+                    } else {
+                        $arr['fld_length'] = substr($strColumnType, $numIdx1+1, $numIdx2-$numIdx1-1);
+                        $arr['fld_precision'] = substr($strColumnType, $numIdx2+1, $numIdx3-$numIdx2-1);
+                    }
+                }
+                //...
+                if ($st->IsNonPrecType($arr['fld_type'])) {
+                    $arr['fld_length'] = '';
+                    $arr['fld_precision'] = '';
+                }
+                switch ($arr['fld_type']) {
+                    case 'decimal':
+                    case 'numeric':
+                    case 'int':
+                    case 'smallint':
+                    case 'float':
+                        $arr['fld_type'] = 'number';
+                        break;
+
+                    case 'nvarchar':
+                    case 'varchar':
+                    case 'text':
+                    case 'char':
+                    case 'nchar':
+                        $arr['fld_type'] = 'text';
+                        break;
+
+                    case 'date':
+                    case 'datetime':
+                    case 'timestamp':
+                        $arr['fld_type'] = 'date';
+                        break;
+                    
+                    default:
+                        // code...
+                        break;
+                }
+
+                //$arr['fld_nullable'] = $arrRow['fld_nullable'];
+                //$arr['fld_default'] = $arrRow['fld_default'];
+
+                $arrField[$arrRow['fld_name']] = $arr;
+            }
+            $this->objDB->free($rs);
+        }
+
+        return $arrField;
+    }
+
     /**
      * Dump primary key constraint
      *

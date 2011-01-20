@@ -32,7 +32,7 @@ class TableStructure
         $this->arrColumnNullable = array();
         $this->objPrimaryConstraint = false;
         $this->arrUniqueCnst = array();
-        $this->arrNonPrecType = array('SMALLINT', 'INT', 'BIT', 'BOOL', 'TINYINT', 'IMAGE');
+        $this->arrNonPrecType = array('SMALLINT', 'INT', 'BIT', 'BOOL', 'TINYINT', 'IMAGE', 'DATE', 'DATETIME', 'TIME', 'TIMESTAMP', 'TEXT', 'LONG', 'BLOB', 'CLOB');
         $this->intIterator = 0;
     }
 

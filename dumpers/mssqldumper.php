@@ -109,6 +109,71 @@ class MSSQLDumper extends GenericDumper
         return $arrField;
     }
 
+    function DumpColumnInfo2($strTableName)
+    {
+        $st = new TableStructure($strTableName);
+        $arrField = array();
+        $strOrderCond = " order by col.colorder";
+
+        $sql = "select col.name as fld_name,type.name as fld_type,col.prec as fld_length,isnull(col.scale,0) as fld_precision,col.isnullable as fld_nullable,isnull(dft.text,'') as fld_default";
+        $sql .= " from $this->strDBName..syscolumns col";
+        $sql .= " inner join $this->strDBName..sysobjects obj";
+        $sql .= " on col.id=obj.id and obj.xtype='U' and obj.name<>'dtproperties'";
+        $sql .= " left join $this->strDBName..systypes type";
+        $sql .= " on col.xtype=type.xusertype";
+        $sql .= " left join $this->strDBName..syscomments dft";
+        $sql .= " on col.cdefault=dft.id";
+        $sql .= " where obj.name='$strTableName'";
+        $sql .= $strOrderCond;
+        //echo htmlspecialchars($sql);
+
+        $rs = $this->objDB->query($sql);
+        if ($rs) {
+            while (($arrRow = $this->objDB->read($rs)) !== false) {
+                $strDefault = trim($arrRow['fld_default']);
+                while (strstr($strDefault, '(')) {
+                    $strDefault = substr($strDefault, 1, strlen($strDefault)-2);
+                }
+                //...
+                if ($st->IsNonPrecType($arrRow['fld_type'])) {
+                    $arrRow['fld_length'] = '';
+                    $arrRow['fld_precision'] = '';
+                }
+                switch ($arrRow['fld_type']) {
+                    case 'nvarchar':
+                    case 'varchar':
+                    case 'text':
+                    case 'char':
+                    case 'nchar':
+                        $arrRow['fld_type'] = 'text';
+                        break;
+
+                    case 'numeric':
+                    case 'int':
+                    case 'smallint':
+                        $arrRow['fld_type'] = 'number';
+                        break;
+
+                    case 'datetime':
+                    case 'timestamp':
+                        $arrRow['fld_type'] = 'date';
+                        break;
+                    
+                    default:
+                        // code...
+                        break;
+                }
+                unset($arrRow['fld_default']);
+                //$arrRow['fld_nullable'] = $arrRow['fld_nullable'] ? 'YES' : 'NO';
+                unset($arrRow['fld_nullable']);
+                $arrField[$arrRow['fld_name']] = $arrRow;
+            }
+            $this->objDB->free($rs);
+        }
+
+        return $arrField;
+    }
+
     /**
      * Dump primary key constraint
      *
