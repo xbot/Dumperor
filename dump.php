@@ -35,11 +35,21 @@ $arrIncTbl = $objCfg->get('inclusive', 'tables');
 $arrCommonEscCol = $objCfg->get('exclusive', 'columns');
 $arrFake = $objCfg->get('fake');
 $intLimit = $objCfg->get('output', 'limit');
-$strOutput1 = $objCfg->get('output', 'output1');
-$strOutput2 = $objCfg->get('output', 'output2');
+$outputDir = $objCfg->get('output', 'dir');
 $bShowTbl = $objCfg->get('output', 'showtable');
 $bShowCreate = $objCfg->get('output', 'showcreate');
 $bShowData = $objCfg->get('output', 'showdata');
+
+// Check environment
+if (!isset($_GET['action'])) {
+    die('Error: Action missing.');
+}
+if (!file_exists($outputDir) && !mkdir($outputDir)) {
+    die('Error: Cannot mkdir '.$outputDir);
+}
+
+// Prepare variables
+$outputFile = null === $outputDir ? null : $outputDir.DIRECTORY_SEPARATOR.urldecode($_GET['c']).'_'.$_GET['action'].'.txt';
 
 // Connect to database
 $db = new PDOWrapper($strDBLogin, $strDBPass, $strDBHost, $strDBName, $strDBType);
@@ -64,11 +74,18 @@ StartHTMLPage($objCfg);
 $arrTbl = $dumper->DumpTableNames();
 sort($arrTbl);
 foreach ($arrTbl as $strTbl) {
-    $objStruct = $dumper->DumpTableInfo($strTbl);
-    file_put_contents(urldecode($_GET['c']).'_table.txt', print_r($objStruct, true), FILE_APPEND);
-    echo '<pre>';
-    print_r($objStruct);
-    echo '</pre>';
+    switch ($_GET['action']) {
+        case 'tableinfo':
+            $objStruct = $dumper->DumpTableInfo($strTbl);
+            file_put_contents($outputFile, print_r($objStruct, true), FILE_APPEND);
+            echo '<pre>';
+            print_r($objStruct);
+            echo '</pre>';
+            break;
+        
+        default:
+            die('Error: Unknown action.');
+    }
     /*
     if ($bShowTbl) {
         $objStruct->OutputHTML();

@@ -8,10 +8,8 @@ password=mypass
 
 ; Output settings
 [OUTPUT]
-; Output file in which the table structures will be output
-;output1=/tmp/structure.sql
-; Output file in which the data will be output
-;output2=/tmp/data.sql
+; Output dir
+dir=/tmp/dumperor
 ; How many lines will be fetched from the database per table
 limit=1000
 ; Should table structures be showed in web browser ?

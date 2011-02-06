@@ -21,7 +21,12 @@
             echo '<h1>Available configurations:</h1>';
             echo '<ol>';
             foreach ($cfgFiles as $file) {
-                echo "<li><a href=\"dump.php?c=".urlencode(basename($file, '.ini'))."\" target=\"_blank\">$file</a></li>";
+                echo "<li><b>$file</b>";
+                echo "<ol><li><a href=\"dump.php?c=".urlencode(basename($file, '.ini'))."&action=tableinfo\" target=\"_blank\">Table structure for comparation.</a></li>";
+                echo "<li><a href=\"dump.php?c=".urlencode(basename($file, '.ini'))."&action=datainfo\" target=\"_blank\">Data for comparation.</a></li>";
+                echo "<li><a href=\"dump.php?c=".urlencode(basename($file, '.ini'))."&action=tablestmt\" target=\"_blank\">Table structure SQL statements.</a></li>";
+                echo "<li><a href=\"dump.php?c=".urlencode(basename($file, '.ini'))."&action=datastmt\" target=\"_blank\">Data SQL statements.</a></li>";
+                echo "</ol></li>";
             }
             echo '</ol>';
         } else {
