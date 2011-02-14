@@ -110,7 +110,7 @@ abstract class GenericDumper
         $arrFields = $this->DumpColumnBriefInfo($strTableName);
         ksort($arrFields);
 
-        $struct['name'] = $strTableName;
+        $struct['name'] = strtolower($strTableName);
         $struct['fields'] = $arrFields;
         //$struct['pk'] = $this->DumpPrimaryConstraint($strTableName);
         //$struct['uk'] = $this->DumpUniqueConstraints($strTableName);
@@ -170,6 +170,42 @@ abstract class GenericDumper
         // Append a batch seperator
         $strSep = $this->GetBatchSeperator();
         $this->Output($strSep, $strOutputFile, $boolForce);
+
+        return $numLines;
+    }
+
+    /**
+     * Dump all data out of the given table for comparation
+     *
+     * @param string Table name
+     * @param string Output file path
+     * @param boolean Whether to output the given data to the standard output device along with the output file, this param goes meanningless if $strOutputFile is false
+     * @return int Number of lines dumped
+     **/
+    function DumpRawData($strTableName, $strOutputFile=false, $boolForce=false)
+    {
+        $numLines = 0;
+        $objStruct = $this->DumpTableStructure($strTableName);
+        $strSQLSlct = $this->GenerateSelectStmt($objStruct);
+
+        $this->Output($strTableName, $strOutputFile, $boolForce);
+        $this->Output('----------', $strOutputFile, $boolForce);
+
+        $rs = $this->objDB->query($strSQLSlct);
+        if ($rs) {
+            while (($arrRow = $this->objDB->read($rs)) !== false) {
+                $numLines++;
+
+                $cols = array();
+                foreach ($arrRow as $key=>$val) {
+                    $cols[] = "$key=>$val";
+                }
+                $this->Output(implode(',', $cols), $strOutputFile, $boolForce);
+            }
+            $this->objDB->free($rs);
+        }
+
+        $this->Output('', $strOutputFile, $boolForce);
 
         return $numLines;
     }

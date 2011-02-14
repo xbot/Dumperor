@@ -38,10 +38,12 @@ class ORACLEDumper extends GenericDumper
         $rs = $this->objDB->query($sql);
         if ($rs) {
             while (($arrRow = $this->objDB->read($rs)) !== false) {
-                $arrTableName[] = $arrRow['TABLE_NAME'];
+                $arrTableName[] = strtolower($arrRow['TABLE_NAME']);
             }
             $this->objDB->free($rs);
         }
+
+        sort($arrTableName);
 
         return $arrTableName;
     }
@@ -109,12 +111,17 @@ class ORACLEDumper extends GenericDumper
         if ($rs) {
             while (($arrRow = $this->objDB->read($rs)) !== false) {
                 $arr = array();
-                $arr['fld_name'] = $arrRow['FLD_NAME'];
+                $arr['fld_name'] = strtolower($arrRow['FLD_NAME']);
                 $strType = $arrRow['FLD_TYPE'];
                 $arr['fld_type'] = $strType;
                 if (self::IsNumCol($strType)) {
-                    $arr['fld_length'] = $arrRow['FLD_LENGTH'];
-                    $arr['fld_precision'] = $arrRow['FLD_PRECISION'];
+                    if (10 >= $arrRow['FLD_LENGTH'] && 0 == $arrRow['FLD_PRECISION']) {
+                        $arr['fld_length'] = '';
+                        $arr['fld_precision'] = '';
+                    } else {
+                        $arr['fld_length'] = $arrRow['FLD_LENGTH'];
+                        $arr['fld_precision'] = $arrRow['FLD_PRECISION'];
+                    }
                 } else if (self::IsCharCol($strType)) {
                     $arr['fld_length'] = $arrRow['FLD_CHAR_LENGTH'];
                     $arr['fld_precision'] = 0;
@@ -122,8 +129,8 @@ class ORACLEDumper extends GenericDumper
                     $arr['fld_length'] = 0;
                     $arr['fld_precision'] = 0;
                 }
-                $arr['fld_nullable'] = $arrRow['FLD_NULLABLE'];
-                $arr['fld_default'] = $arrRow['FLD_DEFAULT'];
+                //$arr['fld_nullable'] = $arrRow['FLD_NULLABLE'];
+                //$arr['fld_default'] = $arrRow['FLD_DEFAULT'];
 
                 //...
                 if ($st->IsNonPrecType($arr['fld_type'])) {
@@ -140,6 +147,7 @@ class ORACLEDumper extends GenericDumper
                     case 'VARCHAR2':
                     case 'NCHAR2':
                     case 'CHAR2':
+                    case 'CHAR':
                     case 'LONG':
                     case 'BLOB':
                     case 'CLOB':

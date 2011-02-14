@@ -49,10 +49,12 @@ class MSSQLDumper extends GenericDumper
         $rs = $this->objDB->query($sql);
         if ($rs) {
             while (($arrRow = $this->objDB->read($rs)) !== false) {
-                $arrTableName[] = $arrRow['name'];
+                $arrTableName[] = strtolower($arrRow['name']);
             }
             $this->objDB->free($rs);
         }
+
+        sort($arrTableName);
 
         return $arrTableName;
     }

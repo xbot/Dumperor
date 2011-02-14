@@ -82,6 +82,14 @@ foreach ($arrTbl as $strTbl) {
             print_r($objStruct);
             echo '</pre>';
             break;
+        case 'rawdata':
+            $lines = $dumper->DumpRawData($strTbl, $outputFile, true);
+            echo <<<HTML
+<p>
+$lines lines of data dumped.
+</p>
+HTML;
+            break;
         
         default:
             die('Error: Unknown action.');

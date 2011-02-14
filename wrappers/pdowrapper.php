@@ -26,6 +26,9 @@ class PDOWrapper extends DBToolkitWrapper
         try {
             $this->conn = new PDO($strDSN, $this->strLogin, $this->strPass);
             $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
+            if ($this->getType()==='mysql') {
+                $this->conn->exec('set names utf8');
+            }
         } catch ( Exception $e ) {
             throw $e;
         }
