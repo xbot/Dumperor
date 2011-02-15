@@ -437,5 +437,10 @@ class MYSQLDumper extends GenericDumper
     {
         return "$strSQL limit 0,$intLimit";
     }
+
+    function hookColHandler(&$sql, $arr)
+    {
+        return false;
+    }
 }
 ?>

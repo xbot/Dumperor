@@ -425,5 +425,10 @@ class MSSQLDumper extends GenericDumper
     {
         return preg_replace('/^select([ ]top[ ][0-9]+)?/', "select top $intLimit", $strSQL);
     }
+
+    function hookColHandler(&$sql, $arr)
+    {
+        return false;
+    }
 }
 ?>

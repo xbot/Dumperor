@@ -444,5 +444,17 @@ class ORACLEDumper extends GenericDumper
     {
         return "$strSQL and rownum<=$intLimit";
     }
+
+    function hookColHandler(&$sql, $arr)
+    {
+        // Oracle PDO driver may raise exception if a lob column is null
+        if ($this->IsLobCol($arr['type'])) {
+            //$sql .= "nvl(tbl.".$arr['name'].", '0') as ".$arr['name'].",";
+            //TODO: fix me
+            $sql .= "'' as ".$arr['name'].",";
+            return true;
+        }
+        return false;
+    }
 }
 ?>

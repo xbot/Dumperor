@@ -86,6 +86,7 @@ foreach ($arrTbl as $strTbl) {
             $lines = $dumper->DumpRawData($strTbl, $outputFile, true);
             echo <<<HTML
 <p>
+$strTbl:<br>
 $lines lines of data dumped.
 </p>
 HTML;

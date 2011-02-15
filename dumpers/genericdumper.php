@@ -198,9 +198,10 @@ abstract class GenericDumper
 
                 $cols = array();
                 foreach ($arrRow as $key=>$val) {
-                    $cols[] = "$key=>$val";
+                    //TODO: fix me
+                    $cols[] = strtolower($key)."=>".str_replace(array("\n","\r","\r\n"), '', $val);
                 }
-                $this->Output(implode(',', $cols), $strOutputFile, $boolForce);
+                $this->Output(implode(',', $cols), $strOutputFile, false);
             }
             $this->objDB->free($rs);
         }
@@ -286,7 +287,12 @@ abstract class GenericDumper
         $objStruct->ResetIterator();
         while ($arr = $objStruct->GetNextCol()) {
             // Escape columns which are needless
-            if (in_array($arr['name'], $this->arrCommonEscCol)) {
+            if (in_array(strtolower($arr['name']), $this->arrCommonEscCol)) {
+                continue;
+            }
+
+            // Hook subclass method to populate the column
+            if ($this->hookColHandler($sql, $arr)) {
                 continue;
             }
 
@@ -312,6 +318,18 @@ abstract class GenericDumper
             }
         }
 
+        // Order
+        $prm = $objStruct->GetPrimaryConstraint();
+        if ($prm instanceof TableConstraint) {
+            $cols = $prm->GetColumns();
+            if (is_array($cols) && count($cols)>0) {
+                foreach ($cols as $k=>$v) {
+                    $cols[$k] = 'tbl.'.$v;
+                }
+                $sql .= " order by ".implode(',', $cols);
+            }
+        }
+
         // Set the limit
         if (is_numeric($this->intLimit) && is_int($this->intLimit+0) && $this->intLimit > 0) {
             $sql = $this->HookLimit($sql, $this->intLimit);
@@ -319,6 +337,15 @@ abstract class GenericDumper
 
         return $sql;
     }
+
+    /**
+     * Let subclass decide what format to use for the column, while generating select SQL statement in GenerateSelectStmt()
+     *
+     * @param string SQL statement
+     * @param array Column information
+     * @return boolean If the subclass handles this column, return true; else return false
+     **/
+    abstract function hookColHandler(&$sql, $arrCol);
 
     /**
      * Generate partition of select statement for date and time fields
