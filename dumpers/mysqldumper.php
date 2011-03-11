@@ -59,7 +59,8 @@ class MYSQLDumper extends GenericDumper
         $strTableName = strtolower($strTableName);
 
         $arrField = array();
-        $strOrderCond = " order by col.ordinal_position";
+        //$strOrderCond = " order by col.ordinal_position";
+        $strOrderCond = " order by col.column_name";
 
         $sql = "select col.column_name as fld_name,col.column_type as fld_type,col.is_nullable as fld_nullable,ifnull(col.column_default,'') as fld_default";
         $sql .= " from information_schema.columns col";

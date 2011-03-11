@@ -233,6 +233,40 @@ abstract class GenericDumper
     }
 
     /**
+     * Output the given table structure by using the Output method in a human readable format
+     *
+     * @param object TableStructure instance
+     * @param string The full path of the output file
+     * @return void
+     **/
+    public function OutputTableStructure($structure, $filePath=false)
+    {
+        // Template for column
+        $tmpl = "Column: %s; Type: %s; Length: %d; Precision: %d;";
+
+        if ($structure instanceof TableStructure) {
+            // Output the table name
+            $this->Output('Table: '.$structure->GetTableName(), $filePath, true);
+            // Output columns
+            $structure->ResetIterator();
+
+            $arr = array();
+            while ($col = $structure->GetNextCol()) {
+                $col = $this->GetCommonColumnStructure($col);
+                $colStr = sprintf($tmpl, strtolower($col['name']), $col['type'], $col['length'], $col['precision']);
+                $arr[] = $colStr;
+            }
+
+            sort($arr);
+            foreach ($arr as $colStr) {
+                $this->Output($colStr, $filePath, true);
+            }
+        } else {
+            $this->Output('OutputTableStructure() needs an instance of TableStructure, '.gettype($structure).' given.', $filePath, true);
+        }
+    }
+
+    /**
      * Check if the given column type is char type
      **/
     public static function IsCharCol($strType)
@@ -751,6 +785,73 @@ abstract class GenericDumper
         if (is_numeric($intLimit) && is_int($intLimit+0) && $intLimit>=0) {
             $this->intLimit = $intLimit;
         }
+    }
+
+    /**
+     * Get common name for the given column type
+     *
+     * @param string Type name
+     * @return string Common type name
+     **/
+    public function GetCommonTypeName($type)
+    {
+        $type = strtolower($type);
+        switch ($type) {
+            case 'nvarchar2':
+            case 'nvarchar':
+                return 'nvarchar';
+                break;
+            case 'clob':
+            case 'blob':
+            case 'text':
+            case 'long':
+                return 'text';
+                break;
+            case 'number':
+            case 'numeric':
+                return 'number';
+                break;
+            case 'date':
+            case 'datetime':
+            case 'time':
+            case 'timestamp':
+                return 'datetime';
+                break;
+            default:
+                return $type;
+                break;
+        }
+    }
+
+    /**
+     * Get common column structure for comparation
+     *
+     * @param array An column structure array
+     * @return array Common structure array
+     **/
+    public function GetCommonColumnStructure($struct)
+    {
+        $fingerprint = sprintf("%s,%d,%d", strtolower($struct['type']), $struct['length'], $struct['precision']);
+
+        switch ($fingerprint) {
+            case 'smallint,0,0':
+            case 'number,6,0':
+                $struct['type'] = 'smallint';
+                $struct['length'] = 0;
+                $struct['precision'] = 0;
+                break;
+            case 'int,0,0':
+            case 'number,10,0':
+                $struct['type'] = 'int';
+                $struct['length'] = 0;
+                $struct['precision'] = 0;
+                break;
+            default:
+                $struct['type'] = $this->GetCommonTypeName($struct['type']);
+                break;
+        }
+
+        return $struct;
     }
 }
 ?>

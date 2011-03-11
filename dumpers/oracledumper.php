@@ -59,7 +59,8 @@ class ORACLEDumper extends GenericDumper
         $strTableName = strtoupper($strTableName);
 
         $arrField = array();
-        $strOrderCond = " order by col.column_id";
+        //$strOrderCond = " order by col.column_id";
+        $strOrderCond = " order by col.column_name";
 
         $sql = "select col.column_name as fld_name,col.data_type as fld_type,nvl(col.data_precision,0) as fld_length,nvl(col.data_scale,0) as fld_precision,nvl(col.char_col_decl_length,0) as fld_char_length,col.nullable as fld_nullable,col.data_default as fld_default";
         $sql .= " from user_tab_columns col";
