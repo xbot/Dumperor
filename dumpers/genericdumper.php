@@ -799,6 +799,8 @@ abstract class GenericDumper
         switch ($type) {
             case 'nvarchar2':
             case 'nvarchar':
+            case 'varchar2':
+            case 'varchar':
                 return 'nvarchar';
                 break;
             case 'clob':
@@ -841,6 +843,7 @@ abstract class GenericDumper
                 $struct['precision'] = 0;
                 break;
             case 'int,0,0':
+            case 'number,0,0':
             case 'number,10,0':
                 $struct['type'] = 'int';
                 $struct['length'] = 0;
