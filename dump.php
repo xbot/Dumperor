@@ -5,8 +5,6 @@
  * @author Li Dong <lenin.lee@gmail.com>
  * @version 0.1a
  * @license http://www.opensource.org/licenses/bsd-license.php
- * @todo Add ODBC support to DB wrapper
- * @todo Add port support to DB wrapper
  **/
 require_once 'wrappers/pdowrapper.php';
 require_once 'dumpers/mssqldumper.php';
@@ -38,7 +36,6 @@ $intLimit = $objCfg->get('output', 'limit');
 $outputDir = $objCfg->get('output', 'dir');
 $bShowTbl = $objCfg->get('output', 'showtable');
 $bShowCreate = $objCfg->get('output', 'showcreate');
-$bShowData = $objCfg->get('output', 'showdata');
 $commTypes = $objCfg->get('common_type_name');
 $commStructs = $objCfg->get('common_column_structure');
 
@@ -95,26 +92,29 @@ $lines lines of data dumped.
 </p>
 HTML;
             break;
-        
+        case 'tablestmt':
+            $struct = $dumper->DumpTableStructure($strTbl);
+            if ($bShowTbl) {
+                $struct->OutputHTML();
+            }
+            $strSQL = $dumper->GenerateCreateTableStmt($struct);
+            echo '<pre>';
+            $dumper->Output($strSQL, $outputFile, $bShowCreate);
+            $dumper->Output("\n\n", $outputFile, $bShowCreate);
+            echo '</pre>';
+            break;
+        case 'datastmt':
+            $lines = $dumper->DumpTable($strTbl, $outputFile);
+            echo <<<HTML
+<p>
+$strTbl:<br>
+$lines lines of data dumped.
+</p>
+HTML;
+            break;
         default:
             die('Error: Unknown action.');
     }
-    /*
-    if ($bShowTbl) {
-        $objStruct->OutputHTML();
-    }
-    $strSQL = $dumper->GenerateCreateTableStmt($objStruct);
-    if ($bShowCreate) {
-        echo '<pre>';
-        $dumper->Output($strSQL, $strOutput1, true);
-        echo '</pre>';
-    }
-    if ($bShowData) {
-        echo '<pre>';
-        $dumper->DumpTable($strTbl, $strOutput2, true);
-        echo '</pre>';
-    }
-     */
 }
 
 StopHTMLPage($objCfg);

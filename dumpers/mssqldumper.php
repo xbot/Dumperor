@@ -69,8 +69,8 @@ class MSSQLDumper extends GenericDumper
         $arrDefault = array();
 
         $arrField = array();
-        //$strOrderCond = " order by col.colorder";
-        $strOrderCond = " order by col.name";
+        $strOrderCond = " order by col.colorder";
+        //$strOrderCond = " order by col.name";
 
         $sql = "select col.name as fld_name,type.name as fld_type,col.prec as fld_length,isnull(col.scale,0) as fld_precision,col.isnullable as fld_nullable,isnull(dft.text,'') as fld_default";
         $sql .= " from $this->strDBName..syscolumns col";

@@ -117,7 +117,7 @@ abstract class GenericDumper
         $arrTableName = $this->DumpTableNames();
 
         foreach ($arrTableName as $strTableName) {
-            $numLines = $this->DumpTable($strTableName, $strOutputFile, $boolForce);
+            $numLines = $this->DumpTable($strTableName, $strOutputFile);
             $numTotal += $numLines;
         }
 
@@ -129,10 +129,9 @@ abstract class GenericDumper
      *
      * @param string Table name
      * @param string Output file path
-     * @param boolean Whether to output the given data to the standard output device along with the output file, this param goes meanningless if $strOutputFile is false
      * @return int Number of lines dumped
      **/
-    function DumpTable($strTableName, $strOutputFile=false, $boolForce=false)
+    function DumpTable($strTableName, $strOutputFile=false)
     {
         $numLines = 0;
         $objStruct = $this->DumpTableStructure($strTableName);
@@ -141,21 +140,22 @@ abstract class GenericDumper
 
         //$this->Output($strSQLSlct);
 
-        $this->Output($strSQLDel, $strOutputFile, $boolForce);
+        $this->Output($strSQLDel, $strOutputFile);
 
         $rs = $this->objDB->query($strSQLSlct);
         if ($rs) {
             while (($arrRow = $this->objDB->read($rs)) !== false) {
                 $strSQLIst = $this->GenerateInsertStmt($objStruct, $arrRow);
                 $numLines++;
-                $this->Output($strSQLIst, $strOutputFile, $boolForce);
+                $this->Output($strSQLIst, $strOutputFile);
             }
             $this->objDB->free($rs);
         }
 
         // Append a batch seperator
-        $strSep = $this->GetBatchSeperator();
-        $this->Output($strSep, $strOutputFile, $boolForce);
+        //$strSep = $this->GetBatchSeperator();
+        //$this->Output($strSep, $strOutputFile, $boolForce);
+        $this->Output("\n\n", $strOutputFile);
 
         return $numLines;
     }

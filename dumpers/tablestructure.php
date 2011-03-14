@@ -14,6 +14,7 @@ class TableStructure
     var $objPrimaryConstraint;      // object, instance of TableConstraint standing for primary key
     var $arrUniqueCnst;             // array, instances of TableConstraint standing for unique constraint
     var $arrNonPrecType;            // array, data types which don't need length and precision
+    var $reset;                     // boolean, reset flag
     
     function __construct($strTableName)
     {
@@ -22,6 +23,7 @@ class TableStructure
         $this->objPrimaryConstraint = false;
         $this->arrUniqueCnst = array();
         $this->arrNonPrecType = array('SMALLINT', 'INT', 'BIT', 'BOOL', 'TINYINT', 'IMAGE', 'DATE', 'DATETIME', 'TIME', 'TIMESTAMP', 'TEXT', 'LONG', 'BLOB', 'CLOB');
+        $this->reset = true;
     }
 
     /**
@@ -30,6 +32,7 @@ class TableStructure
     function Reset()
     {
         reset($this->columns);
+        $this->reset = true;
     }
 
     /**
@@ -69,6 +72,10 @@ class TableStructure
      **/
     function GetNextCol()
     {
+        if ($this->reset === true) {
+            $this->reset = false;
+            return current($this->columns);
+        }
         return next($this->columns);
     }
 

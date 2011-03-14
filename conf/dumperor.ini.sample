@@ -16,8 +16,6 @@ limit=1000
 showtable=1
 ; Should create-table statements be showed in web browser ?
 showcreate=1
-; Should insertion statements be showed in web browser ?
-showdata=1
 ; HTML page charset
 charset=utf-8
 
