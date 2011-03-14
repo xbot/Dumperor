@@ -1,7 +1,7 @@
-Author: Li Dong <lenin.lee@gmail.com>
-Website: http://sinolog.it
-Homepage: http://sinolog.it/?p=1617
-License: New BSD License, http://www.opensource.org/licenses/bsd-license.php
+Author: Li Dong <lenin.lee@gmail.com><br>
+Website: http://sinolog.it<br>
+Homepage: http://sinolog.it/?p=1617<br>
+License: [http://www.opensource.org/licenses/bsd-license.php New BSD License]
 
 *Dumperor* is a multi-database dumping toolkit. It dumps table structures and data from databases, and generates CREATE-TABLE SQL statements for table structures or INSERT SQL statements for data.
 
@@ -42,18 +42,15 @@ For the shortage of time, there must be some limitations and bugs in Dumperor. S
   # Support for auto increment columns has not been implemented.
   # Sensitive columns must be prefixed with table names.
   # Needless columns must be specified only with column names, nothing more.
-  # Data types which have not been tested may fail dumping.
 
 =Installation Instructions=
-*Important: Dumperor is buggy at the moment, and you take all the risks with yourself while trying it.*
 
-  # Download Dumperor.<code>svn checkout http://dumperor.googlecode.com/svn/trunk/ dumperor-read-only</code>
+  # Download a stable release from <a href="http://code.google.com/p/dumperor/">Google Code</a> or the svn repo:<code>svn checkout http://dumperor.googlecode.com/svn/trunk/ dumperor-read-only</code>
   # Copy files to a folder which can be visited by the web server, e.g. www/dumperor.
   # Rename dumperor.ini.sample to dumperor.ini and change the settings to meet your needs.
   # Visit Dumperor from the web browser to start dumping.
 
-=Change Log=
+=News=
 
-*2010-09-22 Wednesday _the Mid-autumn Day of Chinese_*
-
-v0.1a, Initial Release.
+ * 2011-03-14 v1.0.0 released. ([http://code.google.com/p/dumperor/wiki/Changes changes])
+ * 2010-09-22 v0.1a released. ([http://code.google.com/p/dumperor/wiki/Changes changes])
