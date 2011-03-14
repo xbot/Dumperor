@@ -10,13 +10,7 @@
 class TableStructure
 {
     var $strTableName;              // string, table name
-    var $arrColumnName;             // array, column name
-    var $arrColumnType;             // array, column type
-    var $arrColumnLength;           // array, column length
-    var $arrColumnPrecision;        // array, column precision
-    var $arrColumnDefault;          // array, column defaults
-    var $arrColumnNullable;         // array, if is nullable
-    var $intIterator;               // integer, interator index
+    var $columns;                   // array, columns
     var $objPrimaryConstraint;      // object, instance of TableConstraint standing for primary key
     var $arrUniqueCnst;             // array, instances of TableConstraint standing for unique constraint
     var $arrNonPrecType;            // array, data types which don't need length and precision
@@ -24,24 +18,18 @@ class TableStructure
     function __construct($strTableName)
     {
         $this->strTableName = $strTableName;
-        $this->arrColumnName = array();
-        $this->arrColumnType = array();
-        $this->arrColumnLength = array();
-        $this->arrColumnPrecision = array();
-        $this->arrColumnDefault = array();
-        $this->arrColumnNullable = array();
+        $this->columns = array();
         $this->objPrimaryConstraint = false;
         $this->arrUniqueCnst = array();
         $this->arrNonPrecType = array('SMALLINT', 'INT', 'BIT', 'BOOL', 'TINYINT', 'IMAGE', 'DATE', 'DATETIME', 'TIME', 'TIMESTAMP', 'TEXT', 'LONG', 'BLOB', 'CLOB');
-        $this->intIterator = 0;
     }
 
     /**
      * Reset iterator index
      **/
-    function ResetIterator()
+    function Reset()
     {
-        $this->intIterator = 0;
+        reset($this->columns);
     }
 
     /**
@@ -50,43 +38,25 @@ class TableStructure
      **/
     function Sanitize()
     {
-        //Reset lengths and precisions of data types in arrNonPrecType to 0 
-        $intCntType = count($this->arrColumnType);
-        $intCntLength = count($this->arrColumnLength);
-        $intCntPrec = count($this->arrColumnPrecision);
-        if ($intCntType == $intCntLength && $intCntLength == $intCntPrec) {
-            for ($i = 0; $i < $intCntType; $i++) {
-                if ($this->IsNonPrecType($this->arrColumnType[$i])) {
-                    $this->arrColumnLength[$i] = 0;
-                    $this->arrColumnPrecision[$i] = 0;
+        foreach ($this->columns as $colName=>$colDef) {
+            //Reset lengths and precisions of data types in arrNonPrecType to 0 
+            if ($this->IsNonPrecType($colDef['type'])) {
+                $this->columns[$colName]['length'] = 0;
+                $this->columns[$colName]['precision'] = 0;
+            }
+
+            if (!is_bool($colDef['nullable'])) {
+                if (in_array(strtoupper($colDef['nullable'].''), array('Y', 'YES', '1'))) {
+                    $this->columns[$colName]['nullable'] = true;
+                } else if (in_array(strtoupper($colDef['nullable'].''), array('N', 'NO', '0'))) {
+                    $this->columns[$colName]['nullable'] = false;
                 }
             }
-        }
 
-        // Unify nullable values
-        if (is_array($this->arrColumnNullable)) {
-            for ($i = 0; $i < count($this->arrColumnNullable); $i++) {
-                $value = $this->arrColumnNullable[$i];
-                if (is_bool($value)) {
-                    continue;
-                }
-                if (in_array(strtoupper($value.''), array('Y', 'YES', '1'))) {
-                    $this->arrColumnNullable[$i] = true;
-                } else if (in_array(strtoupper($value.''), array('N', 'NO', '0'))) {
-                    $this->arrColumnNullable[$i] = false;
-                }
-            }
-        }
-
-        // Unify defaults
-        if (is_array($this->arrColumnDefault)) {
-            for ($i = 0; $i < count($this->arrColumnDefault); $i++) {
-                $value = $this->arrColumnDefault[$i];
-                if (is_bool($value)) {
-                    continue;
-                }
-                if (strlen(trim($value)) == 0) {
-                    $this->arrColumnDefault[$i] = false;
+            // Unify defaults
+            if (!is_bool($colDef['default'])) {
+                if (strlen(trim($colDef['default'])) == 0) {
+                    $this->columns[$colName]['default'] = false;
                 }
             }
         }
@@ -99,19 +69,19 @@ class TableStructure
      **/
     function GetNextCol()
     {
-        if ($this->intIterator < count($this->arrColumnName)) {
-            $arr = array();
-            $arr['name'] = $this->arrColumnName[$this->intIterator];
-            $arr['type'] = $this->arrColumnType[$this->intIterator];
-            $arr['length'] = $this->arrColumnLength[$this->intIterator];
-            $arr['precision'] = $this->arrColumnPrecision[$this->intIterator];
-            $arr['default'] = $this->arrColumnDefault[$this->intIterator];
-            $arr['nullable'] = $this->arrColumnNullable[$this->intIterator];
-            $this->intIterator += 1;
-            return $arr;
-        }
+        return next($this->columns);
+    }
 
-        return false;
+    /**
+     * Append a column defination to the structure
+     *
+     * @param array Column defination
+     * @return false
+     **/
+    public function AppendColumn($col)
+    {
+        $this->columns[strtolower($col['name'])] = $col;
+        $this->Sanitize();
     }
 
     /**
@@ -153,108 +123,6 @@ class TableStructure
     function SetTableName($strTableName)
     {
         $this->strTableName = $strTableName;
-        $this->Sanitize();
-    }
-
-    /**
-     * Getter of column names
-     **/
-    function GetColumnNames()
-    {
-        return $this->arrColumnName;
-    }
-
-    /**
-     * Setter of column names
-     **/
-    function SetColumnNames($arrColumnName)
-    {
-        $this->arrColumnName = $arrColumnName;
-        $this->Sanitize();
-    }
-
-    /**
-     * Getter of column Types
-     **/
-    function GetColumnTypes()
-    {
-        return $this->arrColumnType;
-    }
-
-    /**
-     * Setter of column Types
-     **/
-    function SetColumnTypes($arrColumnType)
-    {
-        $this->arrColumnType = $arrColumnType;
-        $this->Sanitize();
-    }
-
-    /**
-     * Getter of column Lengths
-     **/
-    function GetColumnLengths()
-    {
-        return $this->arrColumnLength;
-    }
-
-    /**
-     * Setter of column Lengths
-     **/
-    function SetColumnLengths($arrColumnLength)
-    {
-        $this->arrColumnLength = $arrColumnLength;
-        $this->Sanitize();
-    }
-
-    /**
-     * Getter of column precisions
-     **/
-    function GetColumnPrecisions()
-    {
-        return $this->arrColumnPrecision;
-    }
-
-    /**
-     * Setter of column precisions
-     **/
-    function SetColumnPrecisions($arrColumnPrecision)
-    {
-        $this->arrColumnPrecision = $arrColumnPrecision;
-        $this->Sanitize();
-    }
-
-    /**
-     * Getter of column Nullables
-     **/
-    function GetColumnNullables()
-    {
-        return $this->arrColumnNullable;
-    }
-
-    /**
-     * Setter of column Nullables
-     **/
-    function SetColumnNullables($arrColumnNullable)
-    {
-        $this->arrColumnNullable = $arrColumnNullable;
-        $this->Sanitize();
-    }
-
-    /**
-     * Getter of column Defaults
-     **/
-    function GetColumnDefaults()
-    {
-        return $this->arrColumnDefault;
-    }
-
-    /**
-     * Setter of column Defaults
-     **/
-    function SetColumnDefaults($arrColumnDefault)
-    {
-        $this->arrColumnDefault = $arrColumnDefault;
         $this->Sanitize();
     }
 
@@ -359,7 +227,7 @@ class TableStructure
             foreach ($this->arrUniqueCnst as $objCnst) {
                 $arrColumn = $objCnst->GetColumns();
                 foreach ($arrColumn as $strColumn) {
-                    if (strtoupper($strColName) == strtoupper($strColumn)) {
+                    if (strtoupper($strColName) === strtoupper($strColumn)) {
                         return $objCnst;
                     }
                 }
@@ -388,19 +256,27 @@ class TableStructure
     }
 
     /**
+     * Getter for $this->columns
+     **/
+    public function GetColumns()
+    {
+        return $this->columns;
+    }
+
+    /**
      * Generate an HTML table to display the table structure
      **/
     function OutputHTML()
     {
         $strColumns = "";
 
-        for ($i = 0; $i < count($this->arrColumnName); $i++) {
-            $strName = $this->arrColumnName[$i];
-            $strType = $this->arrColumnType[$i];
-            $strLength = $this->arrColumnLength[$i];
-            $strPrecision = $this->arrColumnPrecision[$i];
-            $boolNullable = $this->arrColumnNullable[$i];
-            $strDefault = $this->arrColumnDefault[$i];
+        foreach ($this->columns as $colName=>$colDef) {
+            $strName = $colDef['name'];
+            $strType = $colDef['type'];
+            $strLength = $colDef['length'];
+            $strPrecision = $colDef['precision'];
+            $boolNullable = $colDef['nullable'];
+            $strDefault = $colDef['default'];
 
             $strNullable = $boolNullable === true ? 'TRUE' : ($boolNullable === false ? 'FALSE' : gettype($boolNullable)."($boolNullable)");
             $strDefault = strlen(trim($strDefault)) > 0 ? $strDefault : '&nbsp;';
@@ -440,6 +316,41 @@ class TableStructure
         ";
 
         echo $strHTML;
+    }
+
+    /**
+     * Generate a template string for sprintf() to format the value of a given column
+     *
+     * @todo complete this function
+     **/
+    public function GetColumnTemplate($colName)
+    {
+        $colName = strtolower($colName);
+        if (array_key_exists($colName, $this->columns)) {
+            $tmpl = "$colName: %s";
+            return $tmpl;
+        }
+        return "$colName: %s";
+    }
+
+    /**
+     * Generate a template string for sprintf() to format the output of the table
+     *
+     * @param array Escaped columns, default null
+     * @return none
+     **/
+    public function GetTemplate($escCols=null)
+    {
+        $colTmpls = array();
+        $columns = $this->GetColumns();
+        ksort($columns);
+        foreach ($columns as $colName=>$colDef) {
+            if (is_array($escCols) && in_array($colName, $escCols)) {
+                continue;
+            }
+            $colTmpls[] = $this->GetColumnTemplate($colName);
+        }
+        return implode(',', $colTmpls);
     }
 }
 

@@ -80,13 +80,6 @@ sort($arrTbl);
 foreach ($arrTbl as $strTbl) {
     switch ($_GET['action']) {
         case 'tableinfo':
-            /*
-            $objStruct = $dumper->DumpTableInfo($strTbl);
-            file_put_contents($outputFile, print_r($objStruct, true), FILE_APPEND);
-            echo '<pre>';
-            print_r($objStruct);
-            echo '</pre>';
-             */
             $struct = $dumper->DumpTableStructure($strTbl);
             echo '<pre>';
             $dumper->OutputTableStructure($struct, $outputFile);

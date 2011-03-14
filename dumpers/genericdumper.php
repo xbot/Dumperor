@@ -3,6 +3,7 @@
  * @author Li Dong <lenin.lee@gmail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php
  **/
+include_once 'lib.php';
 include_once 'tablestructure.php';
 
 /**
@@ -57,14 +58,6 @@ abstract class GenericDumper
     abstract function DumpColumnFullInfo($strTableName);
 
     /**
-     * Dump name,type,length of each field from the given table in the given database, except those to be escaped
-     *
-     * @param string Table name
-     * @return array Two-dimensional array, containing three sub arrays: names, types and lengths
-     **/
-    abstract function DumpColumnBriefInfo($strTableName);
-
-    /**
      * Dump primary key constraint
      *
      * @param string Table name
@@ -93,33 +86,22 @@ abstract class GenericDumper
         $arrMeta = $this->DumpColumnFullInfo($strTableName);
         if (count($arrMeta) == 6) {
             $objStruct = new TableStructure($strTableName);
-            $objStruct->SetColumnNames($arrMeta[0]);
-            $objStruct->SetColumnTypes($arrMeta[1]);
-            $objStruct->SetColumnLengths($arrMeta[2]);
-            $objStruct->SetColumnPrecisions($arrMeta[3]);
-            $objStruct->SetColumnNullables($arrMeta[4]);
-            $objStruct->SetColumnDefaults($arrMeta[5]);
+            for ($i = 0; $i < count($arrMeta[0]); $i++) {
+                $col = array();
+                $col['name'] = $arrMeta[0][$i];
+                $col['type'] = $arrMeta[1][$i];
+                $col['length'] = $arrMeta[2][$i];
+                $col['precision'] = $arrMeta[3][$i];
+                $col['nullable'] = $arrMeta[4][$i];
+                $col['default'] = $arrMeta[5][$i];
+                $objStruct->AppendColumn($col);
+            }
 
             $objStruct->SetPrimaryConstraint($this->DumpPrimaryConstraint($strTableName));
             $objStruct->SetUniqueConstraints($this->DumpUniqueConstraints($strTableName));
         }
 
         return $objStruct;
-    }
-
-    function DumpTableInfo($strTableName)
-    {
-        $struct = array();
-
-        $arrFields = $this->DumpColumnBriefInfo($strTableName);
-        ksort($arrFields);
-
-        $struct['name'] = strtolower($strTableName);
-        $struct['fields'] = $arrFields;
-        //$struct['pk'] = $this->DumpPrimaryConstraint($strTableName);
-        //$struct['uk'] = $this->DumpUniqueConstraints($strTableName);
-
-        return $struct;
     }
 
     /**
@@ -191,6 +173,7 @@ abstract class GenericDumper
         $numLines = 0;
         $objStruct = $this->DumpTableStructure($strTableName);
         $strSQLSlct = $this->GenerateSelectStmt($objStruct);
+        $tmpl = $objStruct->GetTemplate($this->GetCommonEscCol($strTableName));
 
         $this->Output($strTableName, $strOutputFile, $boolForce);
         $this->Output('----------', $strOutputFile, $boolForce);
@@ -200,12 +183,11 @@ abstract class GenericDumper
             while (($arrRow = $this->objDB->read($rs)) !== false) {
                 $numLines++;
 
-                $cols = array();
+                $vals = array();
                 foreach ($arrRow as $key=>$val) {
-                    //TODO: fix me
-                    $cols[] = strtolower($key)."=>".str_replace(array("\n","\r","\r\n"), '', $val);
+                    $vals[] = str_replace(array("\n","\r","\r\n"), '', $val);
                 }
-                $this->Output(implode(',', $cols), $strOutputFile, false);
+                $this->Output(array_printf($tmpl, $vals), $strOutputFile, false);
             }
             $this->objDB->free($rs);
         }
@@ -252,7 +234,7 @@ abstract class GenericDumper
             // Output the table name
             $this->Output('Table: '.$structure->GetTableName(), $filePath, true);
             // Output columns
-            $structure->ResetIterator();
+            $structure->Reset();
 
             $arr = array();
             while ($col = $structure->GetNextCol()) {
@@ -322,8 +304,10 @@ abstract class GenericDumper
         $sql = "select ";
 
         // Generate sql statement
-        $objStruct->ResetIterator();
-        while ($arr = $objStruct->GetNextCol()) {
+        $objStruct->Reset();
+        $columns = $objStruct->GetColumns();
+        ksort($columns);
+        foreach ($columns as $colName=>$arr) {
             // Escape columns which are needless
             if (in_array(strtolower($arr['name']), $this->arrCommonEscCol)) {
                 continue;
@@ -470,7 +454,7 @@ abstract class GenericDumper
             $arrColName = array();
             $arrValHolder = array();
 
-            $objStruct->ResetIterator();
+            $objStruct->Reset();
             while ($arrCol = $objStruct->GetNextCol()) {
                 //print_r($arrCol);print_r($this->arrCommonEscCol);die;
                 // Escape columns which are needless
@@ -506,7 +490,7 @@ abstract class GenericDumper
 
         $strClassName = get_class($objStruct);
         if ($strClassName && strtoupper($strClassName) == 'TABLESTRUCTURE') {
-            $objStruct->ResetIterator();
+            $objStruct->Reset();
             while ($arrCol = $objStruct->GetNextCol()) {
                 // Escape columns which are needless
                 if (in_array(strtolower($arrCol['name']), $this->arrCommonEscCol)) {
