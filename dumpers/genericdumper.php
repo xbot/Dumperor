@@ -21,6 +21,8 @@ abstract class GenericDumper
     var $arrCommonEscCol;       // array, common escape columns
     var $arrFakeData;           // array, two-dimentional, table-column-data pairs
     var $intLimit;              // integer, controls how many lines will be retrieved from the database for each table
+    var $commonTypeNames;       // array, common column type names
+    var $commonColumnStructs;   // array, common column structures
     
     function __construct($objDB, $strDBName)
     {
@@ -35,6 +37,8 @@ abstract class GenericDumper
         $this->arrCommonEscCol = array();
         $this->arrFakeData = array();
         $this->intLimit = 0;
+        $this->commonTypeNames = array();
+        $this->commonColumnStructs = array();
     }
 
     /**
@@ -788,6 +792,44 @@ abstract class GenericDumper
     }
 
     /**
+     * Get common column type names
+     **/
+    public function GetCommonTypeNames()
+    {
+        return $this->commTypeNames;
+    }
+
+    /**
+     * Set common column type names
+     *
+     * @param array Common column type names setting array
+     * @return none
+     **/
+    public function SetCommonTypeNames($names)
+    {
+        $this->commTypeNames = $names;
+    }
+
+    /**
+     * Get common column structures
+     **/
+    public function GetCommonColumnStructs()
+    {
+        return $this->commColumnStructs;
+    }
+
+    /**
+     * Set common column structures
+     *
+     * @param array Common column structures setting array
+     * @return none
+     **/
+    public function SetCommonColumnStructs($structs)
+    {
+        $this->commColumnStructs = $structs;
+    }
+
+    /**
      * Get common name for the given column type
      *
      * @param string Type name
@@ -796,33 +838,11 @@ abstract class GenericDumper
     public function GetCommonTypeName($type)
     {
         $type = strtolower($type);
-        switch ($type) {
-            case 'nvarchar2':
-            case 'nvarchar':
-            case 'varchar2':
-            case 'varchar':
-                return 'nvarchar';
-                break;
-            case 'clob':
-            case 'blob':
-            case 'text':
-            case 'long':
-                return 'text';
-                break;
-            case 'number':
-            case 'numeric':
-                return 'number';
-                break;
-            case 'date':
-            case 'datetime':
-            case 'time':
-            case 'timestamp':
-                return 'datetime';
-                break;
-            default:
-                return $type;
-                break;
+        $commNames = $this->GetCommonTypeNames();
+        if (array_key_exists($type, $commNames)) {
+            return $commNames[$type];
         }
+        return $type;
     }
 
     /**
@@ -833,27 +853,15 @@ abstract class GenericDumper
      **/
     public function GetCommonColumnStructure($struct)
     {
+        $commStructs = $this->GetCommonColumnStructs();
         $fingerprint = sprintf("%s,%d,%d", strtolower($struct['type']), $struct['length'], $struct['precision']);
-
-        switch ($fingerprint) {
-            case 'smallint,0,0':
-            case 'number,6,0':
-                $struct['type'] = 'smallint';
-                $struct['length'] = 0;
-                $struct['precision'] = 0;
-                break;
-            case 'int,0,0':
-            case 'number,0,0':
-            case 'number,10,0':
-                $struct['type'] = 'int';
-                $struct['length'] = 0;
-                $struct['precision'] = 0;
-                break;
-            default:
-                $struct['type'] = $this->GetCommonTypeName($struct['type']);
-                break;
+        if (array_key_exists($fingerprint, $commStructs)) {
+            $struct['type'] = $commStructs[$fingerprint][0];
+            $struct['length'] = $commStructs[$fingerprint][1];
+            $struct['precision'] = $commStructs[$fingerprint][2];
+        } else {
+            $struct['type'] = $this->GetCommonTypeName($struct['type']);
         }
-
         return $struct;
     }
 }

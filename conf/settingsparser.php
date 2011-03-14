@@ -3,6 +3,7 @@
  * @author Li Dong <lenin.lee@gmail.com>
  * @license http://www.opensource.org/licenses/bsd-license.php
  **/
+require_once 'global.php';
 require_once 'dumpers/mssqldumper.php';
 require_once 'dumpers/mysqldumper.php';
 require_once 'dumpers/oracledumper.php';
@@ -75,6 +76,8 @@ class SettingsParser
         $this->ParseInclusiveSettings();
         $this->ParseFakeSettings();
         $this->ParseCondSettings();
+        $this->ParseCommonTypeSettings();
+        $this->ParseCommonColumnStructureSettings();
     }
 
     /**
@@ -137,6 +140,31 @@ class SettingsParser
                 }
             }
             $this->set('cond', $xrr);
+        }
+    }
+
+    /**
+     * Parse common type names
+     **/
+    private function ParseCommonTypeSettings()
+    {
+        global $commonTypes;
+        $rawConfig = $this->get('common_type_name');
+        $this->set('common_type_name', array_merge($commonTypes, $rawConfig));
+    }
+
+    /**
+     * Parse common column structure settings
+     **/
+    private function ParseCommonColumnStructureSettings()
+    {
+        global $commonStructs;
+        $rawConfig = $this->get('common_column_structure');
+        $structs = array_merge($commonStructs, $rawConfig);
+        if (is_array($structs) && count($structs)>0) {
+            foreach ($structs as $key=>$val) {
+                $this->set('common_column_structure', $key, explode(',', $val));
+            }
         }
     }
 

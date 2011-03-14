@@ -2,7 +2,7 @@
 [DB]
 type=mysql
 name=test
-host=archer
+host=mydbsvr
 login=root
 password=mypass
 
@@ -37,3 +37,11 @@ charset=utf-8
 ; Common conditions
 [COND]
 ;col6=1
+
+[COMMON_TYPE_NAME]
+;time=datetime
+;timestamp=datetime
+
+[COMMON_COLUMN_STRUCTURE]
+;number,6,0=smallint,0,0
+;decimal,6,0=smallint,0,0

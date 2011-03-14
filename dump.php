@@ -39,6 +39,8 @@ $outputDir = $objCfg->get('output', 'dir');
 $bShowTbl = $objCfg->get('output', 'showtable');
 $bShowCreate = $objCfg->get('output', 'showcreate');
 $bShowData = $objCfg->get('output', 'showdata');
+$commTypes = $objCfg->get('common_type_name');
+$commStructs = $objCfg->get('common_column_structure');
 
 // Check environment
 if (!isset($_GET['action'])) {
@@ -68,6 +70,8 @@ $dumper->AddIncludeTables($arrIncTbl);
 $dumper->SetCommonEscCol($arrCommonEscCol);
 $dumper->SetFakeData($arrFake);
 $dumper->SetLimit($intLimit);
+$dumper->SetCommonTypeNames($commTypes);
+$dumper->SetCommonColumnStructs($commStructs);
 
 StartHTMLPage($objCfg);
 
