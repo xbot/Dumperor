@@ -11,13 +11,13 @@ class Window(tk.Frame):
     def __init__(self, master):
         tk.Frame.__init__(self, master)
 
-        self.lblFileInput = tk.Label(self, text=u"选择文件：")
+        self.lblFileInput = tk.Label(self, text=u"Choose a file: ")
         self.lblFileInput.grid(row=0, column=0)
 
         self.entryFileInput = tk.Entry(self)
         self.entryFileInput.grid(row=0, column=1)
 
-        self.btnFileInput = tk.Button(self, text=u"选择", command=self.askopenfilename)
+        self.btnFileInput = tk.Button(self, text=u"Open", command=self.askopenfilename)
         self.btnFileInput.grid(row=0, column=2, padx=5, pady=5)
 
         self.pnlBtns = tk.Frame(self)
@@ -25,7 +25,7 @@ class Window(tk.Frame):
         #self.btnCheck = tk.Button(self.pnlBtns, text=u"检查")
         #self.btnCheck.grid(row=0, column=0, padx=5, pady=3)
 
-        self.btnFix = tk.Button(self.pnlBtns, text=u"排序", command=self.sort)
+        self.btnFix = tk.Button(self.pnlBtns, text=u"Sort", command=self.sort)
         self.btnFix.grid(row=0, column=1, padx=5, pady=3)
 
         self.pnlBtns.grid(row=1, column=0, columnspan=3)
@@ -75,7 +75,7 @@ class Window(tk.Frame):
 class App:
 
     def __init__(self, master):
-        master.title(u"Dumperor导出文件排序工具")
+        master.title(u"Dumperor Sorting Tool")
         
         self.window = Window(master)
         self.window.pack()
