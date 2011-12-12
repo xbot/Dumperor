@@ -38,7 +38,7 @@ class MYSQLDumper extends GenericDumper
         $rs = $this->objDB->query($sql);
         if ($rs) {
             while (($arrRow = $this->objDB->read($rs)) !== false) {
-                $arrTableName[] = strtolower($arrRow['table_name']);
+                $arrTableName[] = $arrRow['table_name']; // Case of tablename should be kept as original, otherwise queries for columns' info may fail
             }
             $this->objDB->free($rs);
         }
@@ -56,7 +56,6 @@ class MYSQLDumper extends GenericDumper
         $arrPrecision = array();
         $arrNullable = array();
         $arrDefault = array();
-        $strTableName = strtolower($strTableName);
 
         $arrField = array();
         $strOrderCond = " order by col.ordinal_position";
