@@ -366,7 +366,7 @@ class ORACLEDumper extends GenericDumper
      **/
     function HookLimit($strSQL, $intLimit)
     {
-        return "$strSQL and rownum<=$intLimit";
+        return strstr($strSQL, 'order by') ? "select * from ($strSQL) where rownum<=$intLimit" : "$strSQL and rownum<=$intLimit";
     }
 
     function hookColHandler(&$sql, $arr)

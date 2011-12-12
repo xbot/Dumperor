@@ -48,7 +48,23 @@ if (!file_exists($outputDir) && !mkdir($outputDir)) {
 }
 
 // Prepare variables
-$outputFile = null === $outputDir ? null : $outputDir.DIRECTORY_SEPARATOR.urldecode($_GET['c']).'_'.$_GET['action'].'.txt';
+$outputFile = null === $outputDir ? null : $outputDir.DIRECTORY_SEPARATOR.urldecode($_GET['c']).'_'.$_GET['action'];
+switch ($_GET['action']) {
+    case 'tableinfo':
+        $outputFile .= '.txt';
+        break;
+    case 'rawdata':
+        $outputFile .= '.txt';
+        break;
+    case 'tablestmt':
+        $outputFile .= '.sql';
+        break;
+    case 'datastmt':
+        $outputFile .= '.sql';
+        break;
+    default:
+        die('Error: Unknown action.');
+}
 
 // Connect to database
 $db = new PDOWrapper($strDBLogin, $strDBPass, $strDBHost, $strDBName, $strDBType);
@@ -112,8 +128,6 @@ $lines lines of data dumped.
 </p>
 HTML;
             break;
-        default:
-            die('Error: Unknown action.');
     }
 }
 
