@@ -1,3 +1,4 @@
 a:link {color:#3A87CA;text-decoration:none;}
 a:visited {color:#3A87CA;text-decoration:none;}
 a:hover {color:#3A87CA;text-decoration:underline;}
+li.config_item {margin-bottom: 10px;}
