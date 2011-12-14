@@ -8,7 +8,7 @@ include_once 'genericdumper.php';
 /**
  * mysql dumper
  **/
-class MYSQLDumper extends GenericDumper
+class MySQLDumper extends GenericDumper
 {
     /**
      * Dump names of all the tables in the given database, except those to be escaped
@@ -48,7 +48,7 @@ class MYSQLDumper extends GenericDumper
         return $arrTableName;
     }
 
-    function DumpColumnFullInfo($strTableName)
+    function DumpColumnInfo($strTableName)
     {
         $arrName = array();
         $arrType = array();
@@ -206,9 +206,9 @@ class MYSQLDumper extends GenericDumper
      * @param object Table structure
      * @return string Create table statement
      **/
-    function GenerateCreateTableStmt($objStruct)
+    public static function GenerateCreateTableStmt($objStruct)
     {
-        $strTableBody = $this->GenerateCreateTableBodyStmt($objStruct);
+        $strTableBody = self::GenerateCreateTableBodyStmt($objStruct);
 
         $strSQL = "create table if not exists ".$objStruct->GetTableName()." (\n";
         $strSQL .= $strTableBody;
@@ -220,7 +220,7 @@ class MYSQLDumper extends GenericDumper
     /**
      * Generate body of create table statement
      **/
-    private function GenerateCreateTableBodyStmt($objStruct)
+    private static function GenerateCreateTableBodyStmt($objStruct)
     {
         $strBody = "";
         $arrLine = array();

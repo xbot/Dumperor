@@ -8,7 +8,7 @@ include_once 'genericdumper.php';
 /**
  * oracle dumper
  **/
-class ORACLEDumper extends GenericDumper
+class OracleDumper extends GenericDumper
 {
     /**
      * Dump names of all the tables in the given database, except those to be escaped
@@ -48,7 +48,7 @@ class ORACLEDumper extends GenericDumper
         return $arrTableName;
     }
 
-    function DumpColumnFullInfo($strTableName)
+    function DumpColumnInfo($strTableName)
     {
         $arrName = array();
         $arrType = array();
@@ -215,9 +215,9 @@ class ORACLEDumper extends GenericDumper
      * @param object Table structure
      * @return string Create table statement
      **/
-    function GenerateCreateTableStmt($objStruct)
+    public static function GenerateCreateTableStmt($objStruct)
     {
-        $strTableBody = $this->GenerateCreateTableBodyStmt($objStruct);
+        $strTableBody = self::GenerateCreateTableBodyStmt($objStruct);
 
         $strSQL = "declare v_cnt number;\n";
         $strSQL .= "begin\n";
@@ -236,7 +236,7 @@ class ORACLEDumper extends GenericDumper
     /**
      * Generate body of create table statement
      **/
-    private function GenerateCreateTableBodyStmt($objStruct)
+    private static function GenerateCreateTableBodyStmt($objStruct)
     {
         $strBody = "";
         $arrLine = array();
