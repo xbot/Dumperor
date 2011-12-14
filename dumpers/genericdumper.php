@@ -55,7 +55,7 @@ abstract class GenericDumper
      * @param string Table name
      * @return array Two-dimensional array, containing three sub arrays: names, types and lengths
      **/
-    abstract function DumpColumnFullInfo($strTableName);
+    abstract function DumpColumnInfo($strTableName);
 
     /**
      * Dump primary key constraint
@@ -83,7 +83,7 @@ abstract class GenericDumper
     {
         $objStruct = false;
 
-        $arrMeta = $this->DumpColumnFullInfo($strTableName);
+        $arrMeta = $this->DumpColumnInfo($strTableName);
         if (count($arrMeta) == 6) {
             $objStruct = new TableStructure($strTableName);
             for ($i = 0; $i < count($arrMeta[0]); $i++) {
@@ -117,7 +117,7 @@ abstract class GenericDumper
         $arrTableName = $this->DumpTableNames();
 
         foreach ($arrTableName as $strTableName) {
-            $numLines = $this->DumpTable($strTableName, $strOutputFile);
+            $numLines = $this->DumpDataForTable($strTableName, $strOutputFile);
             $numTotal += $numLines;
         }
 
@@ -125,13 +125,13 @@ abstract class GenericDumper
     }
 
     /**
-     * Dump all data of the given table
+     * Dump all data out of the given table
      *
      * @param string Table name
      * @param string Output file path
      * @return int Number of lines dumped
      **/
-    function DumpTable($strTableName, $strOutputFile=false)
+    function DumpDataForTable($strTableName, $strOutputFile=false)
     {
         $numLines = 0;
         $objStruct = $this->DumpTableStructure($strTableName);
@@ -161,14 +161,14 @@ abstract class GenericDumper
     }
 
     /**
-     * Dump all data out of the given table for comparation
+     * Dump all data out of the given table in diffable format
      *
      * @param string Table name
      * @param string Output file path
      * @param boolean Whether to output the given data to the standard output device along with the output file, this param goes meanningless if $strOutputFile is false
      * @return int Number of lines dumped
      **/
-    function DumpRawData($strTableName, $strOutputFile=false, $boolForce=false)
+    function DumpDiffableData($strTableName, $strOutputFile=false, $boolForce=false)
     {
         $numLines = 0;
         $objStruct = $this->DumpTableStructure($strTableName);
@@ -438,7 +438,10 @@ abstract class GenericDumper
      * @param object Table structure
      * @return string SQL statement
      **/
-    abstract function GenerateCreateTableStmt($objStruct);
+    public static function GenerateCreateTableStmt($objStruct)
+    {
+        throw new Exception('Not implemented!');
+    }
 
     /**
      * Generate insert statement template for one row of fetched data

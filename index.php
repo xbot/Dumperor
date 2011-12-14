@@ -23,10 +23,10 @@
             echo '<ol>';
             foreach ($cfgFiles as $file) {
                 echo "<li class=\"config_item\"><b>$file</b>";
-                echo "<ol><li><a href=\"dump.php?c=".urlencode(basename($file, '.ini'))."&action=tableinfo\" target=\"_blank\">Diffable: Table Structure.</a></li>";
-                echo "<li><a href=\"dump.php?c=".urlencode(basename($file, '.ini'))."&action=rawdata\" target=\"_blank\">Diffable: Data.</a></li>";
-                echo "<li><a href=\"dump.php?c=".urlencode(basename($file, '.ini'))."&action=tablestmt\" target=\"_blank\">SQL: Table Structure.</a></li>";
-                echo "<li><a href=\"dump.php?c=".urlencode(basename($file, '.ini'))."&action=datastmt\" target=\"_blank\">SQL: Data.</a></li>";
+                echo "<ol><li><a href=\"dump.php?c=".urlencode(basename($file, '.ini'))."&action=difftable\" target=\"_blank\">Diffable: Table Structure.</a></li>";
+                echo "<li><a href=\"dump.php?c=".urlencode(basename($file, '.ini'))."&action=diffdata\" target=\"_blank\">Diffable: Data.</a></li>";
+                echo "<li><a href=\"dump.php?c=".urlencode(basename($file, '.ini'))."&action=dumptable\" target=\"_blank\">SQL: Table Structure.</a></li>";
+                echo "<li><a href=\"dump.php?c=".urlencode(basename($file, '.ini'))."&action=dumpdata\" target=\"_blank\">SQL: Data.</a></li>";
                 echo "</ol></li>";
             }
             echo '</ol>';

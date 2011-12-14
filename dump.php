@@ -50,16 +50,16 @@ if (!file_exists($outputDir) && !mkdir($outputDir)) {
 // Prepare variables
 $outputFile = null === $outputDir ? null : $outputDir.DIRECTORY_SEPARATOR.urldecode($_GET['c']).'_'.$_GET['action'];
 switch ($_GET['action']) {
-    case 'tableinfo':
+    case 'difftable':
         $outputFile .= '.txt';
         break;
-    case 'rawdata':
+    case 'diffdata':
         $outputFile .= '.txt';
         break;
-    case 'tablestmt':
+    case 'dumptable':
         $outputFile .= '.sql';
         break;
-    case 'datastmt':
+    case 'dumpdata':
         $outputFile .= '.sql';
         break;
     default:
@@ -92,15 +92,15 @@ $arrTbl = $dumper->DumpTableNames();
 sort($arrTbl);
 foreach ($arrTbl as $strTbl) {
     switch ($_GET['action']) {
-        case 'tableinfo':
+        case 'difftable':
             $struct = $dumper->DumpTableStructure($strTbl);
             echo '<pre>';
             $dumper->OutputTableStructure($struct, $outputFile);
             $dumper->Output("\n", $outputFile);
             echo '</pre>';
             break;
-        case 'rawdata':
-            $lines = $dumper->DumpRawData($strTbl, $outputFile, true);
+        case 'diffdata':
+            $lines = $dumper->DumpDiffableData($strTbl, $outputFile, true);
             echo <<<HTML
 <p>
 $strTbl:<br>
@@ -108,7 +108,7 @@ $lines lines of data dumped.
 </p>
 HTML;
             break;
-        case 'tablestmt':
+        case 'dumptable':
             $struct = $dumper->DumpTableStructure($strTbl);
             if ($bShowTbl) {
                 $struct->OutputHTML();
@@ -119,8 +119,8 @@ HTML;
             $dumper->Output("\n\n", $outputFile, $bShowCreate);
             echo '</pre>';
             break;
-        case 'datastmt':
-            $lines = $dumper->DumpTable($strTbl, $outputFile);
+        case 'dumpdata':
+            $lines = $dumper->DumpDataForTable($strTbl, $outputFile);
             echo <<<HTML
 <p>
 $strTbl:<br>
@@ -155,11 +155,11 @@ function GetDumper($conn, $objCfg)
             $dumper = new MSSQLDumper($conn, $objCfg->get('db', 'name'));
             break;
         case 'mysql':
-            $dumper = new MYSQLDumper($conn, $objCfg->get('db', 'name'));
+            $dumper = new MySQLDumper($conn, $objCfg->get('db', 'name'));
             break;
         case 'oracle':
         case 'oci':
-            $dumper = new ORACLEDumper($conn, $objCfg->get('db', 'name'));
+            $dumper = new OracleDumper($conn, $objCfg->get('db', 'name'));
             break;
         default:
             break;

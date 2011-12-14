@@ -59,7 +59,7 @@ class MSSQLDumper extends GenericDumper
         return $arrTableName;
     }
 
-    function DumpColumnFullInfo($strTableName)
+    function DumpColumnInfo($strTableName)
     {
         $arrName = array();
         $arrType = array();
@@ -209,9 +209,9 @@ class MSSQLDumper extends GenericDumper
      * @param object Table structure
      * @return string Create table statement
      **/
-    function GenerateCreateTableStmt($objStruct)
+    public static function GenerateCreateTableStmt($objStruct)
     {
-        $strTableBody = $this->GenerateCreateTableBodyStmt($objStruct);
+        $strTableBody = self::GenerateCreateTableBodyStmt($objStruct);
 
         $strSQL = "if not exists (select 1 from sysobjects where id=object_id('".$objStruct->GetTableName()."') and type='U')\n";
         $strSQL .= "begin\n";
@@ -226,7 +226,7 @@ class MSSQLDumper extends GenericDumper
     /**
      * Generate body of create table statement
      **/
-    private function GenerateCreateTableBodyStmt($objStruct)
+    private static function GenerateCreateTableBodyStmt($objStruct)
     {
         $strBody = "";
         $arrLine = array();
